@@ -1,16 +1,28 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, CSSProperties, memo } from "react";
 import { ICellRendererParams } from "ag-grid-community/dist/lib/rendering/cellRenderers/iCellRenderer";
 import { AgGridReact, AgGridColumnProps } from "ag-grid-react";
 
 const CustomCell = (props: ICellRendererParams & { buttonText: string }) => {
-  const handleClick = () => {
-    window.alert(`Mais informacoes:  ${props.value}`);
+  const imageUrl = "https://picsum.photos/200";
+  const imgStyle: CSSProperties = {
+    width: 30,
+    height: 30,
+    borderRadius: 30,
+    top: 5,
+    left: 0,
+    position: "absolute",
   };
+  const style: CSSProperties = { marginLeft: 20 };
+
+  const renderCountRef = useRef(1);
 
   return (
     <>
-      <button onClick={handleClick}>{props.buttonText}</button>
-      {props.value}
+      <span style={style}>
+        <img src={imageUrl} alt="test" style={imgStyle} />
+        {props.value}
+      </span>
+      <b>({renderCountRef.current++})</b>
     </>
   );
 };
@@ -27,14 +39,14 @@ function App() {
   const columnDefs: AgGridColumnProps[] = [
     {
       field: "make",
-      cellRenderer: CustomCell,
+      cellRenderer: memo(CustomCell),
       cellRendererParams: {
         buttonText: "=",
       },
     },
     {
       field: "model",
-      cellRenderer: CustomCell,
+      cellRenderer: memo(CustomCell),
       cellRendererParams: {
         buttonText: "#",
       },
