@@ -1,5 +1,19 @@
 import { useState, useEffect, useRef } from "react";
+import { ICellRendererParams } from "ag-grid-community/dist/lib/rendering/cellRenderers/iCellRenderer";
 import { AgGridReact, AgGridColumnProps } from "ag-grid-react";
+
+const CustomCell = (props: ICellRendererParams & { buttonText: string }) => {
+  const handleClick = () => {
+    window.alert(`Mais informacoes:  ${props.value}`);
+  };
+
+  return (
+    <>
+      <button onClick={handleClick}>{props.buttonText}</button>
+      {props.value}
+    </>
+  );
+};
 
 function App() {
   const gridRef = useRef<AgGridReact>();
@@ -7,12 +21,24 @@ function App() {
   const defaultColDef: AgGridColumnProps = {
     sortable: true,
     filter: true,
-    editable: true,
+    editable: false,
   };
 
   const columnDefs: AgGridColumnProps[] = [
-    { field: "make" },
-    { field: "model" },
+    {
+      field: "make",
+      cellRenderer: CustomCell,
+      cellRendererParams: {
+        buttonText: "=",
+      },
+    },
+    {
+      field: "model",
+      cellRenderer: CustomCell,
+      cellRendererParams: {
+        buttonText: "#",
+      },
+    },
     { field: "price" },
   ];
 
