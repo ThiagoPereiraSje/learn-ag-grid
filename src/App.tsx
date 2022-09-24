@@ -1,28 +1,26 @@
-import { useState, useEffect, useMemo, useRef } from "react";
-import { AgGridReact } from "ag-grid-react";
+import { useState, useEffect, useRef } from "react";
+import { AgGridReact, AgGridColumnProps } from "ag-grid-react";
 
 function App() {
+  const gridRef = useRef<AgGridReact>();
+
+  const defaultColDef: AgGridColumnProps = {
+    sortable: true,
+    filter: true,
+    editable: true,
+  };
+
+  const columnDefs: AgGridColumnProps[] = [
+    { field: "make" },
+    { field: "model" },
+    { field: "price" },
+  ];
+
   const [rowData, setRowData] = useState([
     { make: "Ford", model: "Focus", price: 40000 },
     { make: "Toyota", model: "Celica", price: 45000 },
     { make: "BMW", model: "4 Series", price: 40000 },
   ]);
-
-  const [columnDefs] = useState([
-    { field: "make" },
-    { field: "model" },
-    { field: "price" },
-  ]);
-
-  const defaultColDef = useMemo(
-    () => ({
-      sortable: true,
-      filter: true,
-    }),
-    []
-  );
-
-  const gridRef: any = useRef();
 
   useEffect(() => {
     fetch("https://www.ag-grid.com/example-assets/row-data.json")
@@ -30,20 +28,15 @@ function App() {
       .then((rowData) => setRowData(rowData));
   }, []);
 
-  const handleRowClick = () => {
-    alert("Foi clicado!");
-  };
-
   const handleButtonClick = () => {
-    gridRef.current.api.deselectAll();
+    console.log("dados: ", rowData);
   };
 
   return (
     <div className="ag-theme-alpine" style={{ height: 500 }}>
-      <button onClick={handleButtonClick}>DeSelectAll</button>
+      <button onClick={handleButtonClick}>Mostrar dados</button>
       <AgGridReact
-        ref={gridRef}
-        onRowClicked={handleRowClick}
+        ref={gridRef as any}
         rowData={rowData}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
