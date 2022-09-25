@@ -1,30 +1,11 @@
-import { useState, useEffect, useRef, CSSProperties, memo } from "react";
-import { ICellRendererParams } from "ag-grid-community/dist/lib/rendering/cellRenderers/iCellRenderer";
+import { useState, useRef, memo, CSSProperties } from "react";
+import { ValueSetterParams } from "ag-grid-community";
 import { AgGridReact, AgGridColumnProps } from "ag-grid-react";
+import NumericCellEditor from "./components/NumericCellEditor";
 
-const CustomCell = (props: ICellRendererParams & { buttonText: string }) => {
-  const imageUrl = "https://picsum.photos/200";
-  const imgStyle: CSSProperties = {
-    width: 30,
-    height: 30,
-    borderRadius: 30,
-    top: 5,
-    left: 0,
-    position: "absolute",
-  };
-  const style: CSSProperties = { marginLeft: 20 };
-
-  const renderCountRef = useRef(1);
-
-  return (
-    <>
-      <span style={style}>
-        <img src={imageUrl} alt="test" style={imgStyle} />
-        {props.value}
-      </span>
-      <b>({renderCountRef.current++})</b>
-    </>
-  );
+const divStyle: CSSProperties = {
+  widows: "100%",
+  height: "95vh",
 };
 
 function App() {
@@ -33,48 +14,42 @@ function App() {
   const defaultColDef: AgGridColumnProps = {
     sortable: true,
     filter: true,
-    editable: false,
+    editable: true,
+    valueSetter: (params: ValueSetterParams) => {
+      params.data[params.colDef.field!] = params.newValue;
+      return true;
+    },
   };
 
   const columnDefs: AgGridColumnProps[] = [
     {
       field: "make",
-      cellRenderer: memo(CustomCell),
-      cellRendererParams: {
-        buttonText: "=",
-      },
     },
     {
       field: "model",
-      cellRenderer: memo(CustomCell),
-      cellRendererParams: {
-        buttonText: "#",
-      },
     },
-    { field: "price" },
+    {
+      field: "price",
+      cellEditor: memo(NumericCellEditor),
+    },
   ];
 
-  const [rowData, setRowData] = useState([
+  const [rowData] = useState([
     { make: "Ford", model: "Focus", price: 40000 },
     { make: "Toyota", model: "Celica", price: 45000 },
     { make: "BMW", model: "4 Series", price: 40000 },
   ]);
 
-  useEffect(() => {
-    fetch("https://www.ag-grid.com/example-assets/row-data.json")
-      .then((result) => result.json())
-      .then((rowData) => setRowData(rowData));
-  }, []);
-
-  const handleButtonClick = () => {
+  const handleClick = () => {
     console.log("dados: ", rowData);
   };
 
   return (
-    <div className="ag-theme-alpine" style={{ height: 500 }}>
-      <button onClick={handleButtonClick}>Mostrar dados</button>
+    <div className="ag-theme-alpine" style={divStyle}>
+      <button onClick={handleClick}>Mostrar dados</button>
       <AgGridReact
         ref={gridRef as any}
+        containerStyle={{ flex: 1 }}
         rowData={rowData}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
